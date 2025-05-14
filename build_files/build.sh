@@ -5,7 +5,7 @@ set -ouex pipefail
 ### Install packages
 
 # Install packages for educational/tinkering tools
-dnf5 install -y /
+dnf5 install -y \
   python3 \
   java-17-openjdk \
   gedit \
@@ -15,10 +15,10 @@ dnf5 install -y /
   simple-scan
 
 # Install CLI tools
-dnf5 install -y /
-  htop /
-  fastfetch /
-  dnscrypt-proxy /
+dnf5 install -y \
+  htop \
+  fastfetch \
+  dnscrypt-proxy \
   podman
 
 ### Setup adblocking and family protection
