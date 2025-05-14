@@ -4,20 +4,47 @@ set -ouex pipefail
 
 ### Install packages
 
-# Packages can be installed from any enabled yum repo on the image.
-# RPMfusion repos are available by default in ublue main images
-# List of rpmfusion packages can be found here:
-# https://mirrors.rpmfusion.org/mirrorlist?path=free/fedora/updates/39/x86_64/repoview/index.html&protocol=https&redirect=1
+# Install packages for educational/tinkering tools
+dnf5 install -y /
+  python3 \
+  java-17-openjdk \
+  gedit \
+  neovim \
+  gnome-disk-utility \
+  transmission-gtk \
+  simple-scan
 
-# this installs a package from fedora repos
-dnf5 install -y tmux 
+# Install CLI tools
+dnf5 install -y /
+  htop /
+  fastfetch /
+  dnscrypt-proxy /
+  podman
 
-# Use a COPR Example:
-#
-# dnf5 -y copr enable ublue-os/staging
-# dnf5 -y install package
-# Disable COPRs so they don't end up enabled on the final image:
-# dnf5 -y copr disable ublue-os/staging
+### Setup adblocking and family protection
+
+# Configure AdGuard Family DoH
+mkdir -p /etc/dnscrypt-proxy
+cat <<EOF > /etc/dnscrypt-proxy/dnscrypt-proxy.toml
+server_names = ['adguard-family']
+
+listen_addresses = ['127.0.2.1:53']
+
+[static.'adguard-family']
+stamp = 'sdns://AgcAAAAAAAAAAAAPZG5zLmFkZ3VhcmQuY29tILkIXf-fksVr3I-ZgR9qp8rT4aAakm4PbXbVXq2s0UNR3zBkcMi5kbnMuYWRndWFyZC5jb20'
+EOF
+
+# Override systemd-resolved to use dnscrypt-proxy
+mkdir -p /etc/systemd/resolved.conf.d
+cat <<EOF > /etc/systemd/resolved.conf.d/selene-dns.conf
+[Resolve]
+DNS=127.0.2.1
+DNSStubListener=no
+EOF
+
+# Enable dnscrypt-proxy on boot
+mkdir -p /etc/systemd/system/multi-user.target.wants
+ln -s /usr/lib/systemd/system/dnscrypt-proxy.service /etc/systemd/system/multi-user.target.wants/dnscrypt-proxy.service
 
 #### Example for enabling a System Unit File
 
