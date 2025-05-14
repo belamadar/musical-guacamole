@@ -7,7 +7,7 @@ set -ouex pipefail
 # Install packages for educational/tinkering tools
 dnf5 install -y \
   python3 \
-  java-17-openjdk \
+  java-21-openjdk \
   gedit \
   neovim \
   gnome-disk-utility \
