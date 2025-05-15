@@ -9,11 +9,6 @@ log() {
 
 log "Starting Selene OS package setup"
 
-# --- RPM REPOS ---
-
-run0 curl -fsSLo /etc/yum.repos.d/brave-browser.repo https://brave-browser-rpm-release.s3.brave.com/brave-browser.repo
-
-
 # --- RPM PACKAGES ---
 
 declare -A RPM_PACKAGES=(
@@ -33,8 +28,6 @@ declare -A RPM_PACKAGES=(
     podman \
     git \
   "
-
-  ["brave-browser"]="brave-browser"
 )
 
 log "Installing RPM packages"
@@ -62,23 +55,26 @@ fi
 # --- CHANGE SETTINGS ---
 
 xdg-settings set default-web-browser com.brave.Browser.desktop || true
-sudo mkdir -p /etc/opt/brave/policies/managed
-cat <<EOF > /etc/opt/brave/policies/managed/settings.json
+flatpak override --system --filesystem=xdg-download --filesystem=home com.brave.Browser
+
+log "Adding Brave first-login config for DuckDuckGo"
+mkdir -p /etc/skel/.config/autostart
+cat <<EOF > /etc/skel/.config/autostart/selene-brave-duckduckgo.desktop
+[Desktop Entry]
+Name=Set Brave Search Engine
+Exec=/usr/bin/env bash -c 'sleep 5 && mkdir -p ~/.config/BraveSoftware/Brave-Browser/Default && cat <<EOT > ~/.config/BraveSoftware/Brave-Browser/Default/Preferences
 {
-  "DefaultSearchProviderEnabled": true,
-  "DefaultSearchProviderName": "DuckDuckGo",
-  "DefaultSearchProviderSearchURL": "https://duckduckgo.com/?q={searchTerms}",
-  "DefaultSearchProviderSuggestURL": "https://duckduckgo.com/ac/?q={searchTerms}&type=list",
-  "DefaultSearchProviderIconURL": "https://duckduckgo.com/favicon.ico",
-  "DefaultSearchProviderKeyword": "duckduckgo",
-
-  "ExtensionInstallForcelist": [
-    "bkdgflcldnnnapblkhphbgpggdiikppg",  // DuckDuckGo Privacy Essentials
-    "ghbmnnjooekpmoecnnnilnnbdlolhkhi",  // ClearURLs
-    "dcpihecpambacapedldabdbpakmachpb"   // Scratch Addons
-  ]
-
+  "default_search_provider": {
+    "enabled": true,
+    "name": "DuckDuckGo",
+    "keyword": "duckduckgo.com",
+    "search_url": "https://duckduckgo.com/?q={searchTerms}",
+    "suggest_url": "https://ac.duckduckgo.com/ac/?q={searchTerms}&type=list"
+  }
 }
+EOT'
+Type=Application
+X-GNOME-Autostart-enabled=true
 EOF
 
 log "Selene OS package setup complete"
