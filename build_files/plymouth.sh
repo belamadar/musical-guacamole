@@ -1,21 +1,22 @@
-
 #!/usr/bin/env bash
 set -e
 
 echo "=== Installing Plymouth Theme ==="
 
-# Theme selection — change this to whichever you want
+# Configuration
+PACK="pack_3"
 THEME_NAME="metal_ball"
 THEME_REPO="https://github.com/adi1090x/plymouth-themes"
-THEME_DIR="/usr/share/plymouth/themes/$THEME_NAME"
+THEME_SOURCE_DIR="/tmp/plymouth-themes/$PACK/$THEME_NAME"
+THEME_TARGET_DIR="/usr/share/plymouth/themes/$THEME_NAME"
 
-# Clone themes repo into temporary location
+# Clone repo
 TMP_DIR="/tmp/plymouth-themes"
 git clone --depth=1 "$THEME_REPO" "$TMP_DIR"
 
-# Copy selected theme into system themes directory
-mkdir -p "$(dirname "$THEME_DIR")"
-cp -r "$TMP_DIR/$THEME_NAME" "$THEME_DIR"
+# Copy selected theme
+mkdir -p "$(dirname "$THEME_TARGET_DIR")"
+cp -r "$THEME_SOURCE_DIR" "$THEME_TARGET_DIR"
 
 # Set theme
 plymouth-set-default-theme -R "$THEME_NAME"
