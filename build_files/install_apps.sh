@@ -13,6 +13,8 @@ log "Starting Selene OS package setup"
 
 declare -A RPM_PACKAGES=(
   ["fedora"]="\
+    plymouth \
+    plymouth-plugin-script \
     python3 \
     java-21-openjdk \
     gedit \
