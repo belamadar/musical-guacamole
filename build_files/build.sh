@@ -2,6 +2,14 @@
 
 set -ouex pipefail
 
+### Uninstall packages from the base image
+
+rpm-ostree override remove \
+	plasma-discover \
+	plasma-discover-flatpak \
+	plasma-discover-notifier \
+	firefox || true
+
 ### Install packages
 
 # Install packages for educational/tinkering tools
@@ -21,6 +29,11 @@ dnf5 install -y \
   dnscrypt-proxy \
   podman
 
+# Install useful flatpaks
+flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
+flatpak install -y --system com.brave.Browser
+
 ### Setup adblocking and family protection
 
 # Configure AdGuard Family DoH
@@ -31,7 +44,7 @@ server_names = ['adguard-family']
 listen_addresses = ['127.0.2.1:53']
 
 [static.'adguard-family']
-stamp = 'sdns://AgcAAAAAAAAAAAAPZG5zLmFkZ3VhcmQuY29tILkIXf-fksVr3I-ZgR9qp8rT4aAakm4PbXbVXq2s0UNR3zBkcMi5kbnMuYWRndWFyZC5jb20'
+stamp = 'sdns://AQMAAAAAAAAAETk0LjE0MC4xNC4xNTo1NDQzILgxXdexS27jIKRw3C7Wsao5jMnlhvhdRUXWuMm1AFq6ITIuZG5zY3J5cHQuZmFtaWx5Lm5zMS5hZGd1YXJkLmNvbQ'
 EOF
 
 # Override systemd-resolved to use dnscrypt-proxy
@@ -46,6 +59,7 @@ EOF
 mkdir -p /etc/systemd/system/multi-user.target.wants
 ln -s /usr/lib/systemd/system/dnscrypt-proxy.service /etc/systemd/system/multi-user.target.wants/dnscrypt-proxy.service
 
-#### Example for enabling a System Unit File
+### Adjust system settings
 
-systemctl enable podman.socket
+xdg-settings set default-web-browser com.brave.Browser.desktop || true
+
