@@ -19,7 +19,7 @@ mkdir -p "$(dirname "$THEME_TARGET_DIR")"
 cp -r "$THEME_SOURCE_DIR" "$THEME_TARGET_DIR"
 
 # Set theme
-plymouth-set-default-theme -R "$THEME_NAME"
+plymouth-set-default-theme "$THEME_NAME"
 
 # Clean up
 rm -rf "$TMP_DIR"
