@@ -2,6 +2,10 @@
 
 set -euo pipefail
 
+log() {
+  echo "=== $* ==="
+}
+
 # --- DNSCrypt Configuration ---
 log "Setting up AdGuard Family DNS over HTTPS"
 mkdir -p /etc/dnscrypt-proxy
